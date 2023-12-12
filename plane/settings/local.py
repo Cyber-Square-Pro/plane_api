@@ -24,7 +24,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "plane_db",
-        "USER": "postgres",
+        "USER": "cybersquare_pro",
         "PASSWORD":"cs-pro@123cybersquare_pro",
         "HOST": "127.0.0.1",
     }
