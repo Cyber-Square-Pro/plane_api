@@ -19,12 +19,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "plane_db",
-        "USER": "postgres",
+        "USER": "cybersquare_pro",
         "PASSWORD":"cs-pro@123cybersquare_pro",
         "HOST": "127.0.0.1",
     }
 }
-
 # if bool(os.environ.get("DATABASE_URL")):
 #     # Parse database configuration from $DATABASE_URL
 #     DATABASES["default"] = dj_database_url.config()
