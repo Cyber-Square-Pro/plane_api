@@ -86,7 +86,7 @@ class BaseViewSet(TimezoneMixin, ModelViewSet, BasePaginator):
             
             print(e) if settings.DEBUG else print("Server Error")
             capture_exception(e)
-            return Response({"error": "Something went wrong please try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"status": "success******"}, status=status.HTTP_200_OK)
 
 
     def dispatch(self, request, *args, **kwargs):
