@@ -71,6 +71,7 @@ class BaseViewSet(TimezoneMixin, ModelViewSet, BasePaginator):
             return response
         except Exception as e:
             if isinstance(e, IntegrityError):
+                print('44444444444444', e)
                 return Response({"error": "The payload is not valid"}, status=status.HTTP_400_BAD_REQUEST)
             
             if isinstance(e, ValidationError):
@@ -141,6 +142,9 @@ class BaseAPIView(TimezoneMixin, APIView, BasePaginator):
 
 
     def handle_exception(self, exc):
+
+        print('exceeeeeeeeeeeeeeeeeeption')
+
         """
         Handle any exception that occurs, by returning an appropriate response,
         or re-raising the error.
@@ -150,6 +154,7 @@ class BaseAPIView(TimezoneMixin, APIView, BasePaginator):
             return response
         except Exception as e:
             if isinstance(e, IntegrityError):
+                print('99999999999999999999999999999999999999', e)
                 return Response({"error": "The payload is not valid"}, status=status.HTTP_400_BAD_REQUEST)
             
             if isinstance(e, ValidationError):
@@ -164,7 +169,7 @@ class BaseAPIView(TimezoneMixin, APIView, BasePaginator):
             
             print(e) if settings.DEBUG else print("Server Error")
             capture_exception(e)
-            return Response({"error": "Something went wrong please try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Something went wrong please try again latejjjjjjjjjjjr"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def dispatch(self, request, *args, **kwargs):
