@@ -233,110 +233,157 @@ class InviteWorkspaceEndpoint(BaseAPIView):
     ]
 
     def post(self, request, slug):
-        emails = request.data.get("emails", False)
-        # Check if email is provided
-        if not emails or not len(emails):
+        
+        data = request.data
+
+        requested_email = data['email']
+        requested_role = data['role']
+        # print(data)
+        # emails = request.data.get("emails", False)
+        
+        workspace = Workspace.objects.get(slug = slug)
+        workspace_member = WorkspaceMember.objects.filter(
+            workspace_id = workspace.id,
+            member__email = requested_email
+            ).exists()
+        
+        if workspace_member:
+            print('email exist')
             return Response(
-                {"error": "Emails are required"}, status=status.HTTP_400_BAD_REQUEST
+                { "message": "Already a member of the workspace", 'statusCode': 400 },
+                
             )
 
-        # check for role level
-        requesting_user = WorkspaceMember.objects.get(
-            workspace__slug=slug, member=request.user
-        )
-        if len(
-            [
-                email
-                for email in emails
-                if int(email.get("role", 10)) > requesting_user.role
-            ]
-        ):
-            return Response(
-                {"error": "You cannot invite a user with higher role"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        workspace = Workspace.objects.get(slug=slug)
-
-        # Check if user is already a member of workspace
-        workspace_members = WorkspaceMember.objects.filter(
-            workspace_id=workspace.id,
-            member__email__in=[email.get("email") for email in emails],
-        ).select_related("member", "workspace", "workspace__owner")
-
-        if len(workspace_members):
-            return Response(
-                {
-                    "error": "Some users are already member of workspace",
-                    "workspace_users": WorkSpaceMemberSerializer(
-                        workspace_members, many=True
-                    ).data,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        workspace_invitations = []
-        for email in emails:
-            try:
-                validate_email(email.get("email"))
-                workspace_invitations.append(
-                    WorkspaceMemberInvite(
-                        email=email.get("email").strip().lower(),
+        try:
+            validate_email(requested_email)
+            WorkspaceMemberInvite(
+                        email = requested_email.strip().lower(),
                         workspace_id=workspace.id,
                         token=jwt.encode(
                             {
-                                "email": email,
+                                "email": requested_email,
                                 "timestamp": datetime.now().timestamp(),
                             },
                             settings.SECRET_KEY,
                             algorithm="HS256",
                         ),
-                        role=email.get("role", 10),
+                        role=requested_role,
                         created_by=request.user,
-                    )
-                )
-            except ValidationError:
+                    ).save()
+            
+            print('**saved*****')
+            
+        except ValidationError:
                 return Response(
                     {
-                        "error": f"Invalid email - {email} provided a valid email address is required to send the invite"
+                        "error": f"Invalid email - { requested_email } provided a valid email address is required to send the invite"
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        WorkspaceMemberInvite.objects.bulk_create(
-            workspace_invitations, batch_size=10, ignore_conflicts=True
-        )
 
-        workspace_invitations = WorkspaceMemberInvite.objects.filter(
-            email__in=[email.get("email") for email in emails]
-        ).select_related("workspace")
+        # Check if email is provided
+        # if not emails or not len(emails):
+        #     return Response(
+        #         {"error": "Emails are required"}, status=status.HTTP_400_BAD_REQUEST
+        #     )
 
-        # create the user if signup is disabled
-        if settings.DOCKERIZED and not settings.ENABLE_SIGNUP:
-            _ = User.objects.bulk_create(
-                [
-                    User(
-                        username=str(uuid4().hex),
-                        email=invitation.email,
-                        password=make_password(uuid4().hex),
-                        is_password_autoset=True,
-                    )
-                    for invitation in workspace_invitations
-                ],
-                batch_size=100,
-            )
+        # # check for role level
+        # requesting_user = WorkspaceMember.objects.get(
+        #     workspace__slug=slug, member=request.user
+        # )
+        # if len(
+        #     [
+        #         email
+        #         for email in emails
+        #         if int(email.get("role", 10)) > requesting_user.role
+        #     ]
+        # ):
+        #     return Response(
+        #         {"error": "You cannot invite a user with higher role"},
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
 
-        for invitation in workspace_invitations:
-            workspace_invitation.delay(
-                invitation.email,
-                workspace.id,
-                invitation.token,
-                settings.WEB_URL,
-                request.user.email,
-            )
+        # workspace = Workspace.objects.get(slug=slug)
+
+        # # Check if user is already a member of workspace
+        # workspace_members = WorkspaceMember.objects.filter(
+        #     workspace_id=workspace.id,
+        #     member__email__in=[email.get("email") for email in emails],
+        # ).select_related("member", "workspace", "workspace__owner")
+
+        # if len(workspace_members):
+        #     return Response(
+        #         {
+        #             "error": "Some users are already member of workspace",
+        #             "workspace_users": WorkSpaceMemberSerializer(
+        #                 workspace_members, many=True
+        #             ).data,
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
+
+        # workspace_invitations = []
+        # for email in emails:
+        #     try:
+        #         validate_email(email.get("email"))
+        #         workspace_invitations.append(
+        #             WorkspaceMemberInvite(
+        #                 email=email.get("email").strip().lower(),
+        #                 workspace_id=workspace.id,
+        #                 token=jwt.encode(
+        #                     {
+        #                         "email": email,
+        #                         "timestamp": datetime.now().timestamp(),
+        #                     },
+        #                     settings.SECRET_KEY,
+        #                     algorithm="HS256",
+        #                 ),
+        #                 role=email.get("role", 10),
+        #                 created_by=request.user,
+        #             )
+        #         )
+        #     except ValidationError:
+        #         return Response(
+        #             {
+        #                 "error": f"Invalid email - {email} provided a valid email address is required to send the invite"
+        #             },
+        #             status=status.HTTP_400_BAD_REQUEST,
+        #         )
+        # WorkspaceMemberInvite.objects.bulk_create(
+        #     workspace_invitations, batch_size=10, ignore_conflicts=True
+        # )
+
+        # workspace_invitations = WorkspaceMemberInvite.objects.filter(
+        #     email__in=[email.get("email") for email in emails]
+        # ).select_related("workspace")
+
+        # # create the user if signup is disabled
+        # if settings.DOCKERIZED and not settings.ENABLE_SIGNUP:
+        #     _ = User.objects.bulk_create(
+        #         [
+        #             User(
+        #                 username=str(uuid4().hex),
+        #                 email=invitation.email,
+        #                 password=make_password(uuid4().hex),
+        #                 is_password_autoset=True,
+        #             )
+        #             for invitation in workspace_invitations
+        #         ],
+        #         batch_size=100,
+        #     )
+
+        # # for invitation in workspace_invitations:
+        # #     workspace_invitation.delay(
+        # #         invitation.email,
+        # #         workspace.id,
+        # #         invitation.token,
+        # #         settings.WEB_URL,
+        # #         request.user.email,
+        # #     )
 
         return Response(
             {
-                "message": "Emails sent successfully",
+                "message": "Email sent successfully",
             },
             status=status.HTTP_200_OK,
         )
@@ -408,13 +455,29 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     ]
 
     def get_queryset(self):
+        query_set =  self.filter_queryset(
+            super()
+            .get_queryset()
+            .filter(workspace__slug=self.kwargs.get("slug"))
+            .select_related("workspace", "workspace__owner", "created_by"))
+        
+        for key in query_set:
+            print(key)
+        print(
+            self.filter_queryset(
+            super()
+            .get_queryset()
+            .filter(workspace__slug=self.kwargs.get("slug"))
+            .select_related("workspace", "workspace__owner", "created_by")
+        )
+        )
         return self.filter_queryset(
             super()
             .get_queryset()
             .filter(workspace__slug=self.kwargs.get("slug"))
             .select_related("workspace", "workspace__owner", "created_by")
         )
-
+    
     def destroy(self, request, slug, pk):
         workspace_member_invite = WorkspaceMemberInvite.objects.get(
             pk=pk, workspace__slug=slug
