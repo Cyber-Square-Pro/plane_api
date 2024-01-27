@@ -43,6 +43,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: "."  # Specify the source as the root of the repository
+          target: "/plane-project-staging/plane_api/"
 
       - name: Run additional commands on Staging
         run: |
