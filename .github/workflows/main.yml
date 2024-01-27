@@ -37,12 +37,12 @@ jobs:
     if: github.event.pull_request.base.ref == 'staging'
 
     steps:
-    - name: Debugging Info
-      run: |
-        echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
-        echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
-        echo "EC2_USERNAME: ${{ secrets.EC2_USERNAME }}"
-        echo "Current Directory: $(pwd)"
+      - name: Debugging Info
+        run: |
+          echo "EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}"
+          echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
+          echo "EC2_USERNAME: ${{ secrets.EC2_USERNAME }}"
+          echo "Current Directory: $(pwd)"
       - name: Deploy to Staging
         uses: appleboy/scp-action@master
         with:
