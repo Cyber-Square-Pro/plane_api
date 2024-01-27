@@ -29,6 +29,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r req.txt
+        - name: Debug
+        run: |
+          ls -R plane-project-staging/plane_api
 
   deploy_staging:
     runs-on: ubuntu-latest
