@@ -43,9 +43,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-        script: |
-            cd plane-project-staging/plane_api/
-            python manage.py migrate
+
+      - name: Run additional commands on Staging
+        run: |
+          sh -i ${{ secrets.EC2_PRIVATE_KEY }} ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "cd plane-project-staging/plane_api/ && python manage.py migrate"
+           
+          
 
 # deploy:
 #   name: Deploying on EC2 via SSH
