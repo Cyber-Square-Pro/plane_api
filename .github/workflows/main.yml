@@ -54,7 +54,7 @@ jobs:
 
       - name: Run additional commands on Staging
         run: |
-          cd /home/ubuntu/plane-project-staging/plane_api/ && python manage.py migrate
+          cd ~/plane-project-staging/plane_api/ && python manage.py migrate
            
           
 
