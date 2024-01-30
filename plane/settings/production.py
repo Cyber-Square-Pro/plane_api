@@ -18,9 +18,9 @@ DEBUG = True
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "plane",
+        "NAME": "plane_db_test",
         "USER": "postgres",
-        "PASSWORD": "root",
+        "PASSWORD": "root@cybersquare",
         "HOST": "localhost",
     }
 }

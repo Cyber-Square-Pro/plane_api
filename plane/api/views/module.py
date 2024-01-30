@@ -249,7 +249,7 @@ class ModuleViewSet(BaseViewSet):
             "labels": label_distribution,
             "completion_chart": {},
         }
-
+       
         if queryset.start_date and queryset.target_date:
             data["distribution"]["completion_chart"] = burndown_plot(
                 queryset=queryset, slug=slug, project_id=project_id, module_id=pk
@@ -298,6 +298,28 @@ class ModuleIssueViewSet(BaseViewSet):
     ]
 
     def get_queryset(self):
+        print('**',self.filter_queryset(
+            super()
+            .get_queryset()
+            .annotate(
+                sub_issues_count=Issue.issue_objects.filter(parent=OuterRef("issue"))
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
+            )
+            .filter(workspace__slug=self.kwargs.get("slug"))
+            .filter(project_id=self.kwargs.get("project_id"))
+            .filter(module_id=self.kwargs.get("module_id"))
+            .filter(project__project_projectmember__member=self.request.user)
+            .select_related("project")
+            .select_related("workspace")
+            .select_related("module")
+            .select_related("issue", "issue__state", "issue__project")
+            .prefetch_related("issue__assignees", "issue__labels")
+            .prefetch_related("module__members")
+            .distinct()
+        )
+        )
         return self.filter_queryset(
             super()
             .get_queryset()
@@ -326,6 +348,7 @@ class ModuleIssueViewSet(BaseViewSet):
         group_by = request.GET.get("group_by", False)
         sub_group_by = request.GET.get("sub_group_by", False)
         filters = issue_filters(request.query_params, "GET")
+        print('888888888888888888888888888')
         issues = (
             Issue.issue_objects.filter(issue_module__module_id=module_id)
             .annotate(

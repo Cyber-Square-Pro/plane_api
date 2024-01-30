@@ -23,9 +23,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "plane",
+        "NAME": "plane_db_test",
         "USER": "postgres",
-        "PASSWORD": "root",
+      "PASSWORD": "root@cybersquare",
         "HOST": "localhost",
     }
 }
@@ -113,8 +113,8 @@ SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN", False)
 
 LOGGER_BASE_URL = os.environ.get("LOGGER_BASE_URL", False)
 
-CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
-CELERY_BROKER_URL = os.environ.get("REDIS_URL")
+# CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL")
+# CELERY_BROKER_URL = os.environ.get("REDIS_URL")
 
 GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN", False)
 
@@ -122,3 +122,16 @@ ENABLE_SIGNUP = os.environ.get("ENABLE_SIGNUP", "1") == "1"
 
 # Unsplash Access key
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY")
+
+
+# settings.py
+
+# Celery configuration
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use your own broker URL
+
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Use your own result backend URL
+
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'UTC'
