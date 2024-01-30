@@ -86,6 +86,7 @@ from plane.utils.issue_filters import issue_filters
 
 class IssueViewSet(BaseViewSet):
     def get_serializer_class(self):
+
         return (
             IssueCreateSerializer
             if self.action in ["create", "update", "partial_update"]
@@ -274,6 +275,7 @@ class IssueViewSet(BaseViewSet):
         return Response(IssueSerializer(issue).data, status=status.HTTP_200_OK)
 
     def partial_update(self, request, slug, project_id, pk=None):
+        print('********hello*******',slug,project_id)
         issue = Issue.objects.get(workspace__slug=slug, project_id=project_id, pk=pk)
         current_instance = json.dumps(
             IssueSerializer(issue).data, cls=DjangoJSONEncoder
@@ -281,6 +283,7 @@ class IssueViewSet(BaseViewSet):
         requested_data = json.dumps(self.request.data, cls=DjangoJSONEncoder)
         serializer = IssueCreateSerializer(issue, data=request.data, partial=True)
         if serializer.is_valid():
+            print('*****************hi')
             serializer.save()
             issue_activity.delay(
                 type="issue.activity.updated",

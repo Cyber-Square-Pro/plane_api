@@ -66,6 +66,7 @@ class Issue(ProjectBaseModel):
         blank=True,
         related_name="parent_issue",
     )
+    
     state = models.ForeignKey(
         "db.State",
         on_delete=models.CASCADE,
@@ -75,7 +76,8 @@ class Issue(ProjectBaseModel):
     )
     estimate_point = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(7)], null=True, blank=True
-    )
+    ) 
+    story_point = models.IntegerField(default = 0)                                                                                                                                
     name = models.CharField(max_length=255, verbose_name="Issue Name")
     description = models.JSONField(blank=True, default=dict)
     description_html = models.TextField(blank=True, default="<p></p>")

@@ -15,7 +15,7 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/<uuid:project_id>/modules/",
         ModuleViewSet.as_view(
             {
-                "get": "list",
+                "get": "list",     
                 "post": "create",
             }
         ),

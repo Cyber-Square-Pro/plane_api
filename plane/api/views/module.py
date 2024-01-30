@@ -55,6 +55,7 @@ class ModuleViewSet(BaseViewSet):
         )
 
     def get_queryset(self):
+        
 
         subquery = ModuleFavorite.objects.filter(
             user=self.request.user,
@@ -156,7 +157,6 @@ class ModuleViewSet(BaseViewSet):
 
     def retrieve(self, request, slug, project_id, pk):
         queryset = self.get_queryset().get(pk=pk)
-
         assignee_distribution = (
             Issue.objects.filter(
                 issue_module__module_id=pk,
@@ -254,7 +254,6 @@ class ModuleViewSet(BaseViewSet):
             data["distribution"]["completion_chart"] = burndown_plot(
                 queryset=queryset, slug=slug, project_id=project_id, module_id=pk
             )
-
         return Response(
             data,
             status=status.HTTP_200_OK,
