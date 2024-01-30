@@ -54,11 +54,7 @@ jobs:
 
       - name: Run additional commands on Staging
         run: |
-          pwd
-          env
-          ls -la /home/ubuntu/plane-project-staging/plane_api/
-          cd /home/ubuntu/plane-project-staging/plane_api/
-          pwd
+          cd ubuntu@ip-172-31-2-20:/home/ubuntu/plane-project-staging/plane_api/
           python manage.py migrate
            
           
